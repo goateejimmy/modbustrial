@@ -34,7 +34,9 @@ namespace modbustrial
 		bool monitor = false;
 		private readonly object lockObj = new object();
 
-		bool sendstream;
+		//bool sendstream;
+		Task Streamdatatask;
+		CancellationTokenSource cts;
 		public enum Mode
 		{
 			Sleep_Mode = 1,
@@ -130,45 +132,45 @@ namespace modbustrial
 			
 				if (port.BytesToRead >= recievedDatalength)
 				{
-					if (monitor)
-					{
+					//if (monitor)
+					//{
 
-						byte[] buffer = new byte[recievedDatalength];
-						//https://sparxeng.com/blog/software/must-use-net-system-io-ports-serialport
-						await port.BaseStream.ReadAsync(buffer, 0, buffer.Length); 
-
-
+					//	byte[] buffer = new byte[recievedDatalength];
+					//	//https://sparxeng.com/blog/software/must-use-net-system-io-ports-serialport
+					//	await port.BaseStream.ReadAsync(buffer, 0, buffer.Length); 
 
 
 
-						//port.Read(buffer, 0, buffer.Length);
-
-						if (buffer[0] != (byte)0X01 || buffer[1] != (byte)0X64)
-						{
-							return;
-						}
-						if (recievedDatalength > 17)
-						{
-							byte[] b_position = new byte[] { buffer[5], buffer[4], buffer[3], buffer[2] };
-							this.position = BitConverter.ToInt32(b_position, 0);
-							byte[] b_force = new byte[] { buffer[9], buffer[8], buffer[7], buffer[6] };
-							this.force = BitConverter.ToInt32(b_force, 0);
 
 
-							string hex = BitConverter.ToString(buffer);
+					//	//port.Read(buffer, 0, buffer.Length);
 
-							AppendText(hex);
-							Stream_forcetextbox.Invoke(new Action(() =>
-							Stream_forcetextbox.Text = this.force.ToString()
-							));
-							Stream_positiontextbox.Invoke(new Action(() =>
-							Stream_positiontextbox.Text = this.position.ToString()
-							));
-						}
+					//	if (buffer[0] != (byte)0X01 || buffer[1] != (byte)0X64)
+					//	{
+					//		return;
+					//	}
+					//	if (recievedDatalength > 17)
+					//	{
+					//		byte[] b_position = new byte[] { buffer[5], buffer[4], buffer[3], buffer[2] };
+					//		this.position = BitConverter.ToInt32(b_position, 0);
+					//		byte[] b_force = new byte[] { buffer[9], buffer[8], buffer[7], buffer[6] };
+					//		this.force = BitConverter.ToInt32(b_force, 0);
 
-					}
-					else
-					{
+
+					//		string hex = BitConverter.ToString(buffer);
+
+					//		AppendText(hex);
+					//		Stream_forcetextbox.Invoke(new Action(() =>
+					//		Stream_forcetextbox.Text = this.force.ToString()
+					//		));
+					//		Stream_positiontextbox.Invoke(new Action(() =>
+					//		Stream_positiontextbox.Text = this.position.ToString()
+					//		));
+					//	}
+
+					//}
+					//else
+					//{
 						byte[] buffer = new byte[recievedDatalength];
 						port.Read(buffer, 0, buffer.Length);
 						string hex = BitConverter.ToString(buffer);
@@ -177,7 +179,7 @@ namespace modbustrial
 						//));
 						AppendText(hex);
 
-					}
+					//}
 				}
 			
 			
@@ -216,44 +218,87 @@ namespace modbustrial
 			}
 		}
 
-		private async Task sending(CancellationToken ct)
-		{
-			try
-			{
 
-			}
-			 catch (Exception ex)
-			{
-
-			}
-		}
 
 
 		private async void stream_motorcommandstream_Click(object sender, EventArgs e)
 		{
-		
-			sendstream = true;
-			setbaudrate(int.Parse(port_baudrate.Text), 0);
-			
-			await Task.Delay(10);
-			this.port.DiscardInBuffer();
-			monitor = true;
-			while (sendstream)
+			//port.DataReceived -= Port_DataReceived;
+
+			//cts?.Dispose();
+			//cts = new CancellationTokenSource();		
+			//CancellationToken ct = cts.Token;
+
+			//await startread_send_streaming(ct);
+			////Streamdatatask = Task.Run(() => startread_send_streaming(ct));
+			///
+			port.DataReceived -= Port_DataReceived;
+			//this.port.DiscardInBuffer();
+			while (true)
 			{
+				await MotorCommandStream(0X22, 1);
+				//await Task.Delay(1); 
 
-				
-				MotorCommandStream(0X22, 1);
-				await Task.Delay(1); //3.5*10/125000 = 0.28 ms
-
-
-				HatpicConstant(force_adjust.Value); 
-				await Task.Delay(1);
+				await transferp_l();
 
 			}
 
+			//await HatpicConstant(force_adjust.Value);
+			//await Task.Delay(1); //3.5*10/125000 = 0.28 ms
+			//this.port.DiscardInBuffer();
 
 		}
+		private async Task startread_send_streaming(CancellationToken ct)
+		{
 
+			while (true)
+			{
+				await MotorCommandStream(0X22, 1);
+				//await Task.Delay(1); 
+
+				await transferp_l();
+
+				//await HatpicConstant(force_adjust.Value);
+				//await Task.Delay(1); //3.5*10/125000 = 0.28 ms
+				//this.port.DiscardInBuffer();
+
+
+
+			}
+
+		}
+		private async Task transferp_l()
+		{
+			byte[] buffer = new byte[19];
+			port.Read(buffer, 0, buffer.Length);
+			//https://sparxeng.com/blog/software/must-use-net-system-io-ports-serialport
+			//await port.BaseStream.ReadAsync(buffer, 0, buffer.Length);
+
+
+			if (buffer[0] != (byte)0X01 || buffer[1] != (byte)0X64)
+			{
+				return;
+			}
+
+			byte[] b_position = new byte[] { buffer[5], buffer[4], buffer[3], buffer[2] };
+			this.position = BitConverter.ToInt32(b_position, 0);
+			byte[] b_force = new byte[] { buffer[9], buffer[8], buffer[7], buffer[6] };
+			this.force = BitConverter.ToInt32(b_force, 0);
+
+
+			string hex = BitConverter.ToString(buffer);
+
+			AppendText(hex);
+			Stream_forcetextbox.Invoke(new Action(() =>
+			Stream_forcetextbox.Text = this.force.ToString()
+			));
+			Stream_positiontextbox.Invoke(new Action(() =>
+			Stream_positiontextbox.Text = this.position.ToString()
+			));
+			
+
+
+		}
 
 
 		private void label10_Click(object sender, EventArgs e)
@@ -271,7 +316,7 @@ namespace modbustrial
 			setbaudrate(int.Parse(port_baudrate.Text),0);
 
 			
-			MotorCommandStream(0X22, 1);
+			await MotorCommandStream(0X22, 1);
 		}
 		//this is a stream command
 		void setbaudrate(int baudrate,ushort interdelay)
@@ -365,9 +410,13 @@ namespace modbustrial
 
 		private async void stream_disable_Click(object sender, EventArgs e)
 		{
-			sendstream = false;
+			if (cts != null)
+			{
+				cts.Cancel();
+			}
 			await Task.Delay(2000);
 			this.port.DiscardInBuffer();
+			this.port.DataReceived += Port_DataReceived;
 			recievedDatalength = 11;
 			byte[] command = new byte[6]; //This command require 9 bytes
 			command[0] = (byte)0x01; // Address
@@ -382,7 +431,7 @@ namespace modbustrial
 			command[4] = (byte)(crc & 0xFF);   // CRC High byte
 			command[5] = (byte)(crc >> 8); // CRC Low byte
 			command_currentCommand.Text = BitConverter.ToString(command);
-			this.port.Write(command, 0, command.Length);
+			await this.port.BaseStream.WriteAsync(command, 0, command.Length);
 			await Task.Delay(100);
 			Setmode(Mode.Sleep_Mode);
 		}
@@ -399,7 +448,7 @@ namespace modbustrial
 
 		private void enable_sleep_Click(object sender, EventArgs e)
 		{
-			sendstream = false;
+			
 			Setmode(Mode.Sleep_Mode);
 		}
 
@@ -417,7 +466,7 @@ namespace modbustrial
 
 
 		//Function for packing command
-		public void HatpicConstant(int forcemn)
+		public async Task HatpicConstant(int forcemn)
 		{
 			this.WriteTwoRegister((ushort)Register.CONSTANT_FORCE_MN, forcemn);	
 		}
@@ -450,7 +499,7 @@ namespace modbustrial
 
 
 		}
-		public void MotorCommandStream(byte subcode, int data)
+		public async Task MotorCommandStream(byte subcode, int data)
 		{
 			//monitor = true;
 			//this.port.DataReceived += Port_StreanDataReceived;
@@ -476,13 +525,14 @@ namespace modbustrial
 			command[8] = (byte)(crc >> 8); // CRC Low byte
 
 			command_currentCommand.Text = BitConverter.ToString(command);
-			this.port.Write(command, 0, command.Length);
+			//this.port.Write(command, 0, command.Length);
+			await this.port.BaseStream.WriteAsync(command, 0, command.Length);
 
 
 
 		}
 		//I think there will be a function pointer that can adjust the command with different number of register
-		public void WriteTwoRegister(ushort startingAddress, int continuousvalue)
+		public async void WriteTwoRegister(ushort startingAddress, int continuousvalue)
 		{
 			//monitor = false;
 			recievedDatalength = 8;
@@ -518,7 +568,8 @@ namespace modbustrial
 
 			command_currentCommand.Text = BitConverter.ToString(command);
 			
-			this.port.Write(command, 0, command.Length);
+			//this.port.Write(command, 0, command.Length);
+			await this.port.BaseStream.WriteAsync(command, 0, command.Length);
 		}
 		public byte[] packet8byte(byte func, ushort address, ushort cmd)
 		{
