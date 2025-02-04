@@ -234,18 +234,17 @@ namespace modbustrial
 			///
 			port.DataReceived -= Port_DataReceived;
 			//this.port.DiscardInBuffer();
-			while (true)
-			{
-				await MotorCommandStream(0X22, 1);
+			
+			await MotorCommandStream(0X22, 1);
 				//await Task.Delay(1); 
 
-				await transferp_l();
+			await transferp_l();
 
-			}
 
 			//await HatpicConstant(force_adjust.Value);
+			//this.port.ReadExisting();
 			//await Task.Delay(1); //3.5*10/125000 = 0.28 ms
-			//this.port.DiscardInBuffer();
+			////this.port.DiscardInBuffer();
 
 		}
 		private async Task startread_send_streaming(CancellationToken ct)
