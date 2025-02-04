@@ -99,6 +99,7 @@ namespace modbustrial
 				//OrcaModbus =new Modbus();
 				//motorport.Write()
 				port_status.Text = $"Conneted! Initial baudrate is :{port.BaudRate}";
+				
 			}
 			else if(port_baudrate.Text != "")
 			{
@@ -124,18 +125,23 @@ namespace modbustrial
 
 		}
 
-		private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
+		private async void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
 		{
-			lock (lockObj)
-			{
+			
 				if (port.BytesToRead >= recievedDatalength)
 				{
 					if (monitor)
 					{
 
 						byte[] buffer = new byte[recievedDatalength];
+						//https://sparxeng.com/blog/software/must-use-net-system-io-ports-serialport
+						await port.BaseStream.ReadAsync(buffer, 0, buffer.Length); 
 
-						port.Read(buffer, 0, buffer.Length);
+
+
+
+
+						//port.Read(buffer, 0, buffer.Length);
 
 						if (buffer[0] != (byte)0X01 || buffer[1] != (byte)0X64)
 						{
@@ -173,7 +179,7 @@ namespace modbustrial
 
 					}
 				}
-			}
+			
 			
 		}
 
@@ -210,12 +216,22 @@ namespace modbustrial
 			}
 		}
 
+		private async Task sending(CancellationToken ct)
+		{
+			try
+			{
 
+			}
+			 catch (Exception ex)
+			{
+
+			}
+		}
 
 
 		private async void stream_motorcommandstream_Click(object sender, EventArgs e)
 		{
-			
+		
 			sendstream = true;
 			setbaudrate(int.Parse(port_baudrate.Text), 0);
 			
