@@ -101,7 +101,6 @@
 			this.port_baudrate.ReadOnly = true;
 			this.port_baudrate.Size = new System.Drawing.Size(233, 31);
 			this.port_baudrate.TabIndex = 6;
-			this.port_baudrate.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
 			// 
 			// port_status
 			// 
@@ -169,7 +168,6 @@
 			this.haptic_ctrlregister.TabIndex = 2;
 			this.haptic_ctrlregister.Text = "Enable constant force";
 			this.haptic_ctrlregister.UseVisualStyleBackColor = true;
-			this.haptic_ctrlregister.Click += new System.EventHandler(this.try_forcetesthaptic_Click);
 			// 
 			// label4
 			// 
@@ -271,7 +269,6 @@
 			this.label6.Size = new System.Drawing.Size(265, 35);
 			this.label6.TabIndex = 1;
 			this.label6.Text = "Recieved Command";
-			this.label6.Click += new System.EventHandler(this.label6_Click);
 			// 
 			// label11
 			// 
@@ -282,7 +279,6 @@
 			this.label11.Size = new System.Drawing.Size(51, 22);
 			this.label11.TabIndex = 1;
 			this.label11.Text = "Force";
-			this.label11.Click += new System.EventHandler(this.label10_Click);
 			// 
 			// label8
 			// 
@@ -302,7 +298,6 @@
 			this.label13.Size = new System.Drawing.Size(39, 22);
 			this.label13.TabIndex = 1;
 			this.label13.Text = "mN";
-			this.label13.Click += new System.EventHandler(this.label10_Click);
 			// 
 			// label5
 			// 
@@ -323,7 +318,6 @@
 			this.label12.Size = new System.Drawing.Size(35, 22);
 			this.label12.TabIndex = 1;
 			this.label12.Text = "um";
-			this.label12.Click += new System.EventHandler(this.label10_Click);
 			// 
 			// label10
 			// 
@@ -334,7 +328,6 @@
 			this.label10.Size = new System.Drawing.Size(71, 22);
 			this.label10.TabIndex = 1;
 			this.label10.Text = "Position";
-			this.label10.Click += new System.EventHandler(this.label10_Click);
 			// 
 			// panel4
 			// 
@@ -422,7 +415,6 @@
 			this.label9.Size = new System.Drawing.Size(135, 22);
 			this.label9.TabIndex = 1;
 			this.label9.Text = "Command Force";
-			this.label9.Click += new System.EventHandler(this.label10_Click);
 			// 
 			// label14
 			// 
@@ -433,7 +425,6 @@
 			this.label14.Size = new System.Drawing.Size(39, 22);
 			this.label14.TabIndex = 1;
 			this.label14.Text = "mN";
-			this.label14.Click += new System.EventHandler(this.label10_Click);
 			// 
 			// Form1
 			// 

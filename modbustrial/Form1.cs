@@ -22,7 +22,6 @@ namespace modbustrial
 		//port settingstring[
 		string[] ports = SerialPort.GetPortNames();
 		int baudrate = 125000;
-		int recievedDatalength;
 
 		//Stream Motor value
 		int position;
@@ -31,8 +30,8 @@ namespace modbustrial
 		int temperature;
 		int voltage;
 		int errors;
-		bool monitor = false;
-		private readonly object lockObj = new object();
+		
+		
 
 		//bool sendstream;
 		Task Streamdatatask;
@@ -96,7 +95,6 @@ namespace modbustrial
 				port.Open();
 				port.DiscardInBuffer();
 				port.DiscardOutBuffer();
-				port.DataReceived += Port_DataReceived;
 				port_baudrate.Text = baudrate.ToString();
 				//OrcaModbus =new Modbus();
 				//motorport.Write()
@@ -111,7 +109,6 @@ namespace modbustrial
 				port.Open();
 				port.DiscardInBuffer();
 				port.DiscardOutBuffer();
-				port.DataReceived += Port_DataReceived;
 				//int timeout = (int)Math.Ceiling(int.Parse(port_baudrate.Text) * 220 * 1.5);
 				//setbaudrate(int.Parse(port_baudrate.Text));
 				settimeout(2);
@@ -121,66 +118,9 @@ namespace modbustrial
 			await Task.Delay(100);
 			Setmode(Mode.Sleep_Mode);
 			await Task.Delay(100);
+			await ReadRecieved(8);
 			//settimeout(2000);
 
-
-
-		}
-
-		private async void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
-		{
-
-			if (port.BytesToRead >= recievedDatalength)
-			{
-				//if (monitor)
-				//{
-
-				//	byte[] buffer = new byte[recievedDatalength];
-				//	//https://sparxeng.com/blog/software/must-use-net-system-io-ports-serialport
-				//	await port.BaseStream.ReadAsync(buffer, 0, buffer.Length); 
-
-
-
-
-
-				//	//port.Read(buffer, 0, buffer.Length);
-
-				//	if (buffer[0] != (byte)0X01 || buffer[1] != (byte)0X64)
-				//	{
-				//		return;
-				//	}
-				//	if (recievedDatalength > 17)
-				//	{
-				//		byte[] b_position = new byte[] { buffer[5], buffer[4], buffer[3], buffer[2] };
-				//		this.position = BitConverter.ToInt32(b_position, 0);
-				//		byte[] b_force = new byte[] { buffer[9], buffer[8], buffer[7], buffer[6] };
-				//		this.force = BitConverter.ToInt32(b_force, 0);
-
-
-				//		string hex = BitConverter.ToString(buffer);
-
-				//		AppendText(hex);
-				//		Stream_forcetextbox.Invoke(new Action(() =>
-				//		Stream_forcetextbox.Text = this.force.ToString()
-				//		));
-				//		Stream_positiontextbox.Invoke(new Action(() =>
-				//		Stream_positiontextbox.Text = this.position.ToString()
-				//		));
-				//	}
-
-				//}
-				//else
-				//{
-				byte[] buffer = new byte[recievedDatalength];
-				port.Read(buffer, 0, buffer.Length);
-				string hex = BitConverter.ToString(buffer);
-				//command_recivedCommand.Invoke(new Action(() =>
-				//command_recivedCommand.Text = hex
-				//));
-				AppendText(hex);
-
-				//}
-			}
 
 
 		}
@@ -198,25 +138,6 @@ namespace modbustrial
 			}
 		}
 
-		private void textBox1_TextChanged(object sender, EventArgs e)
-		{
-
-		}
-
-
-		private async void try_forcetesthaptic_Click(object sender, EventArgs e)
-		{
-
-			//await Task.Delay(20);
-			//this.port.DataReceived += Port_DataReceived;
-			while (true)
-			{
-
-				this.WriteSingleRegister((ushort)Register.HAPTIC_STATUS, (ushort)1); //only open the constant function, see page 42
-				Thread.Sleep(1);
-
-			}
-		}
 
 
 
@@ -229,12 +150,10 @@ namespace modbustrial
 				cts?.Cancel();
 				cts?.Dispose();
 				cts = new CancellationTokenSource();
-				CancellationToken ct = cts.Token;
-
-				port.DataReceived -= Port_DataReceived;
+				
 
 				// 在背景執行緒執行迴圈，避免 UI 卡住
-				await Task.Run(async () => await startread_send_streaming(ct), ct);
+				await Task.Run(async () => await startread_send_streaming(cts.Token), cts.Token);
 			}
 			catch (Exception ex)
 			{
@@ -298,6 +217,16 @@ namespace modbustrial
 
 
 		}
+		private async Task ReadRecieved(int recievedatalength)
+		{
+		
+
+				byte[] buffer = new byte[recievedatalength];
+				await port.BaseStream.ReadAsync(buffer, 0, buffer.Length);
+				string hex = BitConverter.ToString(buffer);
+				AppendText(hex);
+
+		}
 		private int GetForceAdjustValue()
 		{
 			if (force_adjust.InvokeRequired)
@@ -310,10 +239,6 @@ namespace modbustrial
 			}
 		}
 
-		private void label10_Click(object sender, EventArgs e)
-		{
-
-		}
 
 		private void port_comport_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -330,7 +255,6 @@ namespace modbustrial
 		//this is a stream command
 		void setbaudrate(int baudrate, ushort interdelay)
 		{
-			recievedDatalength = 11;
 			byte[] command = new byte[12]; //This command require 9 bytes
 			command[0] = (byte)0x01; // Address
 			command[1] = (byte)0X41;// Motor Command Stream
@@ -395,7 +319,6 @@ namespace modbustrial
 		}
 		private void button3_Click(object sender, EventArgs e)
 		{
-			recievedDatalength = 8;
 			byte[] command = new byte[15];
 			command[0] = (byte)0X01;
 			command[1] = (byte)0X10;
@@ -446,14 +369,13 @@ namespace modbustrial
 
 		private async void stream_disable_Click(object sender, EventArgs e)
 		{
-			if (cts != null)
+			if (!cts.IsCancellationRequested )
 			{
 				cts.Cancel();
 			}
 			await Task.Delay(2000);
 			this.port.DiscardInBuffer();
-			this.port.DataReceived += Port_DataReceived;
-			recievedDatalength = 11;
+
 			byte[] command = new byte[6]; //This command require 9 bytes
 			command[0] = (byte)0x01; // Address
 			command[1] = (byte)0X41;// Motor Command Stream
@@ -491,10 +413,21 @@ namespace modbustrial
 			Setmode(Mode.Kinematic_Mode);
 		}
 
-		private void enable_sleep_Click(object sender, EventArgs e)
+		private async void enable_sleep_Click(object sender, EventArgs e)
 		{
+			if (cts != null)
+			{
+				if (!cts.IsCancellationRequested)
+				{
+					cts.Cancel();
+					await Task.Delay(2000);
+					this.port.DiscardInBuffer();
+				}
+
+			}
 
 			Setmode(Mode.Sleep_Mode);
+
 		}
 
 		private void enable_force_Click(object sender, EventArgs e)
@@ -504,7 +437,6 @@ namespace modbustrial
 
 		private void force_constant_Click(object sender, EventArgs e)
 		{
-			recievedDatalength = 8;
 			this.WriteTwoRegister((ushort)Register.FORCE_CMD, 50000);
 		}
 
@@ -515,16 +447,19 @@ namespace modbustrial
 		{
 			this.WriteTwoRegister((ushort)Register.CONSTANT_FORCE_MN, forcemn);
 		}
-		public void Setmode(Mode mode)
+		public async void Setmode(Mode mode)
 		{
-			//monitor = false;
-			this.WriteSingleRegister((ushort)Register.CTRL_REG_3, (ushort)mode);
+			
+
+			await this.WriteSingleRegister((ushort)Register.CTRL_REG_3, (ushort)mode);
+			await ReadRecieved(8);
 		}
 
 		public void ReadHoldingRegister(ushort startAddress, ushort quantity)
 		{
-			//monitor = false;
-			recievedDatalength = 5 + 2 * quantity;
+			
+
+			//recievedDatalength = 5 + 2 * quantity;
 
 			// Modbus Command Structure (Example for Read)
 			// | Device ID | Function Code | Start Address | Quantity | CRC |
@@ -543,10 +478,9 @@ namespace modbustrial
 
 		}
 
-		public void WriteSingleRegister(ushort writeAddress, ushort writevalue)
+		public async Task WriteSingleRegister(ushort writeAddress, ushort writevalue)
 		{
-			//monitor = false;
-			recievedDatalength = 8;
+
 			byte[] command = packet8byte(6, writeAddress, writevalue);
 			string text = BitConverter.ToString(command);
 
@@ -558,15 +492,12 @@ namespace modbustrial
 			{
 				command_currentCommand.Text = text;
 			}
-			this.port.Write(command, 0, command.Length);
+			await this.port.BaseStream.WriteAsync(command, 0, command.Length);
 
 
 		}
 		public async Task MotorCommandStream(byte subcode, int data)
 		{
-			//monitor = true;
-			//this.port.DataReceived += Port_StreanDataReceived;
-			recievedDatalength = 19;
 			byte[] command = new byte[9]; //This command require 9 bytes
 			command[0] = (byte)0x01; // Address
 			command[1] = (byte)0X64;// Motor Command Stream
@@ -606,8 +537,7 @@ namespace modbustrial
 		//I think there will be a function pointer that can adjust the command with different number of register
 		public async void WriteTwoRegister(ushort startingAddress, int continuousvalue)
 		{
-			//monitor = false;
-			recievedDatalength = 8;
+
 			byte[] command = new byte[13];
 			command[0] = (byte)0X01;
 			command[1] = (byte)0X10;
@@ -705,8 +635,18 @@ namespace modbustrial
 
 		}
 
-		private void zeroposition_Click(object sender, EventArgs e)
+		private async void zeroposition_Click(object sender, EventArgs e)
 		{
+			if(cts != null)
+			{
+				if (!cts.IsCancellationRequested)
+				{
+					cts.Cancel();
+					await Task.Delay(2000);
+					this.port.DiscardInBuffer();
+				}
+
+			}
 			byte[] command = packet8byte((byte)0x06, (ushort)Register.CTRL_REG_0, 4);
 			string text = BitConverter.ToString(command);
 
@@ -719,12 +659,10 @@ namespace modbustrial
 				command_currentCommand.Text = text;
 			}
 
-			this.port.Write(command, 0, command.Length);
+			await this.port.BaseStream.WriteAsync(command, 0, command.Length);
+			await ReadRecieved(8);
 		}
 
-		private void label6_Click(object sender, EventArgs e)
-		{
-
-		}
+	
 	}
 }
