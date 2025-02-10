@@ -37,7 +37,6 @@
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
-			this.haptic_ctrlregister = new System.Windows.Forms.Button();
 			this.label4 = new System.Windows.Forms.Label();
 			this.panel3 = new System.Windows.Forms.Panel();
 			this.zeroposition = new System.Windows.Forms.Button();
@@ -54,14 +53,19 @@
 			this.label12 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.panel4 = new System.Windows.Forms.Panel();
+			this.BLGF_selectpathButton = new System.Windows.Forms.Button();
+			this.label15 = new System.Windows.Forms.Label();
 			this.command_force = new System.Windows.Forms.TextBox();
 			this.force_adjust = new System.Windows.Forms.TrackBar();
 			this.stream_disable = new System.Windows.Forms.Button();
+			this.haptic_ctrlregister = new System.Windows.Forms.Button();
 			this.haptic_setforce = new System.Windows.Forms.Button();
 			this.stream_motorcommandstream = new System.Windows.Forms.Button();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label14 = new System.Windows.Forms.Label();
+			this.ttry = new System.Windows.Forms.TextBox();
+			this.BLGF_StartTest = new System.Windows.Forms.Button();
 			this.panel1.SuspendLayout();
 			this.panel3.SuspendLayout();
 			this.panel4.SuspendLayout();
@@ -158,16 +162,6 @@
 			this.label1.Size = new System.Drawing.Size(206, 35);
 			this.label1.TabIndex = 1;
 			this.label1.Text = "Port connection";
-			// 
-			// haptic_ctrlregister
-			// 
-			this.haptic_ctrlregister.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-			this.haptic_ctrlregister.Location = new System.Drawing.Point(283, 98);
-			this.haptic_ctrlregister.Name = "haptic_ctrlregister";
-			this.haptic_ctrlregister.Size = new System.Drawing.Size(235, 58);
-			this.haptic_ctrlregister.TabIndex = 2;
-			this.haptic_ctrlregister.Text = "Enable constant force";
-			this.haptic_ctrlregister.UseVisualStyleBackColor = true;
 			// 
 			// label4
 			// 
@@ -331,6 +325,10 @@
 			// 
 			// panel4
 			// 
+			this.panel4.Controls.Add(this.BLGF_StartTest);
+			this.panel4.Controls.Add(this.ttry);
+			this.panel4.Controls.Add(this.BLGF_selectpathButton);
+			this.panel4.Controls.Add(this.label15);
 			this.panel4.Controls.Add(this.command_force);
 			this.panel4.Controls.Add(this.force_adjust);
 			this.panel4.Controls.Add(this.stream_disable);
@@ -345,10 +343,31 @@
 			this.panel4.Size = new System.Drawing.Size(940, 857);
 			this.panel4.TabIndex = 5;
 			// 
+			// BLGF_selectpathButton
+			// 
+			this.BLGF_selectpathButton.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+			this.BLGF_selectpathButton.Location = new System.Drawing.Point(23, 319);
+			this.BLGF_selectpathButton.Name = "BLGF_selectpathButton";
+			this.BLGF_selectpathButton.Size = new System.Drawing.Size(235, 56);
+			this.BLGF_selectpathButton.TabIndex = 12;
+			this.BLGF_selectpathButton.Text = "Select profile";
+			this.BLGF_selectpathButton.UseVisualStyleBackColor = true;
+			this.BLGF_selectpathButton.Click += new System.EventHandler(this.button1_Click_2);
+			// 
+			// label15
+			// 
+			this.label15.AutoSize = true;
+			this.label15.Font = new System.Drawing.Font("Book Antiqua", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label15.Location = new System.Drawing.Point(17, 268);
+			this.label15.Name = "label15";
+			this.label15.Size = new System.Drawing.Size(241, 35);
+			this.label15.TabIndex = 11;
+			this.label15.Text = "BLGF force profile";
+			// 
 			// command_force
 			// 
 			this.command_force.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-			this.command_force.Location = new System.Drawing.Point(524, 428);
+			this.command_force.Location = new System.Drawing.Point(529, 585);
 			this.command_force.Name = "command_force";
 			this.command_force.ReadOnly = true;
 			this.command_force.Size = new System.Drawing.Size(139, 31);
@@ -356,7 +375,7 @@
 			// 
 			// force_adjust
 			// 
-			this.force_adjust.Location = new System.Drawing.Point(23, 424);
+			this.force_adjust.Location = new System.Drawing.Point(28, 581);
 			this.force_adjust.Maximum = 50000;
 			this.force_adjust.Name = "force_adjust";
 			this.force_adjust.Size = new System.Drawing.Size(495, 56);
@@ -373,6 +392,16 @@
 			this.stream_disable.Text = "Disable High-Speed";
 			this.stream_disable.UseVisualStyleBackColor = true;
 			this.stream_disable.Click += new System.EventHandler(this.stream_disable_Click);
+			// 
+			// haptic_ctrlregister
+			// 
+			this.haptic_ctrlregister.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+			this.haptic_ctrlregister.Location = new System.Drawing.Point(283, 98);
+			this.haptic_ctrlregister.Name = "haptic_ctrlregister";
+			this.haptic_ctrlregister.Size = new System.Drawing.Size(235, 58);
+			this.haptic_ctrlregister.TabIndex = 2;
+			this.haptic_ctrlregister.Text = "Enable constant force";
+			this.haptic_ctrlregister.UseVisualStyleBackColor = true;
 			// 
 			// haptic_setforce
 			// 
@@ -410,7 +439,7 @@
 			// 
 			this.label9.AutoSize = true;
 			this.label9.Font = new System.Drawing.Font("Book Antiqua", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label9.Location = new System.Drawing.Point(32, 380);
+			this.label9.Location = new System.Drawing.Point(37, 537);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(135, 22);
 			this.label9.TabIndex = 1;
@@ -420,11 +449,34 @@
 			// 
 			this.label14.AutoSize = true;
 			this.label14.Font = new System.Drawing.Font("Book Antiqua", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label14.Location = new System.Drawing.Point(669, 437);
+			this.label14.Location = new System.Drawing.Point(674, 594);
 			this.label14.Name = "label14";
 			this.label14.Size = new System.Drawing.Size(39, 22);
 			this.label14.TabIndex = 1;
 			this.label14.Text = "mN";
+			// 
+			// ttry
+			// 
+			this.ttry.Font = new System.Drawing.Font("新細明體", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+			this.ttry.Location = new System.Drawing.Point(296, 319);
+			this.ttry.Multiline = true;
+			this.ttry.Name = "ttry";
+			this.ttry.ReadOnly = true;
+			this.ttry.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+			this.ttry.Size = new System.Drawing.Size(529, 240);
+			this.ttry.TabIndex = 13;
+			this.ttry.TextChanged += new System.EventHandler(this.ttry_TextChanged);
+			// 
+			// BLGF_StartTest
+			// 
+			this.BLGF_StartTest.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+			this.BLGF_StartTest.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.BLGF_StartTest.Location = new System.Drawing.Point(23, 391);
+			this.BLGF_StartTest.Name = "BLGF_StartTest";
+			this.BLGF_StartTest.Size = new System.Drawing.Size(235, 56);
+			this.BLGF_StartTest.TabIndex = 14;
+			this.BLGF_StartTest.Text = "Start Test";
+			this.BLGF_StartTest.UseVisualStyleBackColor = true;
 			// 
 			// Form1
 			// 
@@ -466,7 +518,6 @@
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Panel panel4;
 		private System.Windows.Forms.Label label7;
-		private System.Windows.Forms.Button haptic_ctrlregister;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Button stream_motorcommandstream;
 		private System.Windows.Forms.TextBox Stream_forcetextbox;
@@ -483,6 +534,11 @@
 		private System.Windows.Forms.TextBox command_force;
 		private System.Windows.Forms.Label label14;
 		private System.Windows.Forms.Button zeroposition;
+		private System.Windows.Forms.Button haptic_ctrlregister;
+		private System.Windows.Forms.Button BLGF_selectpathButton;
+		private System.Windows.Forms.Label label15;
+		private System.Windows.Forms.TextBox ttry;
+		private System.Windows.Forms.Button BLGF_StartTest;
 	}
 }
 

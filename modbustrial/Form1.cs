@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Threading;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.IO;
 
 namespace modbustrial
 {
@@ -17,7 +18,7 @@ namespace modbustrial
 	{
 		private static Form1 form = null;
 
-
+		
 		SerialPort port;
 		//port settingstring[
 		string[] ports = SerialPort.GetPortNames();
@@ -36,6 +37,14 @@ namespace modbustrial
 		//bool sendstream;
 		Task Streamdatatask;
 		CancellationTokenSource cts;
+
+		//BLGF curves
+		List<float> BLGFForce;
+		List<float> BLGFdisplacement;
+
+
+
+
 		public enum Mode
 		{
 			Sleep_Mode = 1,
@@ -144,7 +153,7 @@ namespace modbustrial
 
 		private async void stream_motorcommandstream_Click(object sender, EventArgs e)
 		{
-			try
+			 try
 			{
 				// 確保舊的執行緒被正確取消
 				cts?.Cancel();
@@ -187,6 +196,34 @@ namespace modbustrial
 				MessageBox.Show($"Unexpected error: {ex.Message}");
 			}
 		}
+
+
+		private async Task start_BLGF(CancellationToken ct)
+		{
+			try
+			{
+				while (!ct.IsCancellationRequested) // 使用 CancellationToken 來控制結束
+				{
+					await MotorCommandStream(0X22, 1);
+					await transferp_l(19);
+					await Task.Delay(1, ct); // 允許取消
+					int forceValue = GetForceAdjustValue();
+					await HatpicConstant(forceValue);
+					await transferp_l(8);
+					await Task.Delay(1, ct); // 允許取消
+				}
+			}
+			catch (TaskCanceledException)
+			{
+				Console.WriteLine("Streaming task was canceled.");
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"Unexpected error: {ex.Message}");
+			}
+		}
+
+
 		private async Task transferp_l(int len)
 		{
 			byte[] buffer = new byte[len];
@@ -663,6 +700,56 @@ namespace modbustrial
 			await ReadRecieved(8);
 		}
 
-	
+		private void button1_Click_2(object sender, EventArgs e)
+		{
+			BLGFdisplacement = new List<float>();
+			BLGFForce = new List<float>();
+
+			string folderPath = @"K:\DEVT\ZZZ- Test Server\B-000108 EMAI\2.Test Related Documents\11. Feasibilty Study and Test Order\2025\TW-25-T0006\TW25T0006-C2G1V2S3\TW25T0006-C2G1V2S3.is_ccyclic_Exports\TW25T0006-C2G1V2S3_7.csv";
+			using(var reader = new StreamReader(folderPath))
+			{
+				string line;
+				reader.ReadLine();
+				reader.ReadLine();
+				while((line = reader.ReadLine()) != null)
+				{
+					string[] buf = line.Split(',');
+					if (buf.Length >= 3)
+					{
+						string forceValue = buf[2].Replace("\"", "").Trim();
+						string displacementValue = buf[1].Replace("\"", "").Trim();
+
+						// 檢查是否為空
+						if (string.IsNullOrWhiteSpace(forceValue) || string.IsNullOrWhiteSpace(displacementValue))
+						{
+							Console.WriteLine($"Skipping empty value: [{line}]");
+							continue;
+						}
+
+						try
+						{
+							float force = float.Parse(forceValue);
+							float displacement = float.Parse(displacementValue);
+
+							BLGFForce.Add(force);
+							BLGFdisplacement.Add(displacement);
+						}
+						catch (FormatException ex)
+						{
+							Console.WriteLine($"Parse error on line: {line}");
+							Console.WriteLine($"Error message: {ex.Message}");
+						}
+					}
+					
+					
+				}
+
+			}
+		}
+
+		private void ttry_TextChanged(object sender, EventArgs e)
+		{
+
+		}
 	}
 }
