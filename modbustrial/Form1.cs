@@ -11,6 +11,7 @@ using System.IO.Ports;
 using System.Threading;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace modbustrial
 {
@@ -39,8 +40,9 @@ namespace modbustrial
 		CancellationTokenSource cts;
 
 		//BLGF curves
-		List<float> BLGFForce;
-		List<float> BLGFdisplacement;
+		List<int> BLGFForce; // use int to directly compare with the register value
+		List<int> BLGFdisplacement;
+		int BLGFcursor;
 
 
 
@@ -146,6 +148,18 @@ namespace modbustrial
 				command_recivedCommand.AppendText(newText + Environment.NewLine);
 			}
 		}
+		private void AppendBLGF(string newText)
+		{
+			if (ttry.InvokeRequired)
+			{
+				ttry.Invoke(new Action(() => AppendBLGF(newText)));
+			}
+			else
+			{
+				ttry.AppendText(newText + Environment.NewLine);
+			}
+		}
+
 
 
 
@@ -198,32 +212,10 @@ namespace modbustrial
 		}
 
 
-		private async Task start_BLGF(CancellationToken ct)
-		{
-			try
-			{
-				while (!ct.IsCancellationRequested) // 使用 CancellationToken 來控制結束
-				{
-					await MotorCommandStream(0X22, 1);
-					await transferp_l(19);
-					await Task.Delay(1, ct); // 允許取消
-					int forceValue = GetForceAdjustValue();
-					await HatpicConstant(forceValue);
-					await transferp_l(8);
-					await Task.Delay(1, ct); // 允許取消
-				}
-			}
-			catch (TaskCanceledException)
-			{
-				Console.WriteLine("Streaming task was canceled.");
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show($"Unexpected error: {ex.Message}");
-			}
-		}
+		
 
 
+	
 		private async Task transferp_l(int len)
 		{
 			byte[] buffer = new byte[len];
@@ -702,9 +694,9 @@ namespace modbustrial
 
 		private void button1_Click_2(object sender, EventArgs e)
 		{
-			BLGFdisplacement = new List<float>();
-			BLGFForce = new List<float>();
-
+			BLGFdisplacement = new List<int>();
+			BLGFForce = new List<int>();
+			this.BLGFcursor = 0;
 			string folderPath = @"K:\DEVT\ZZZ- Test Server\B-000108 EMAI\2.Test Related Documents\11. Feasibilty Study and Test Order\2025\TW-25-T0006\TW25T0006-C2G1V2S3\TW25T0006-C2G1V2S3.is_ccyclic_Exports\TW25T0006-C2G1V2S3_7.csv";
 			using(var reader = new StreamReader(folderPath))
 			{
@@ -713,6 +705,7 @@ namespace modbustrial
 				reader.ReadLine();
 				while((line = reader.ReadLine()) != null)
 				{
+					AppendBLGF(line);
 					string[] buf = line.Split(',');
 					if (buf.Length >= 3)
 					{
@@ -731,8 +724,9 @@ namespace modbustrial
 							float force = float.Parse(forceValue);
 							float displacement = float.Parse(displacementValue);
 
-							BLGFForce.Add(force);
-							BLGFdisplacement.Add(displacement);
+							BLGFForce.Add(-(int)(force*100000)); // KN --> mN
+							BLGFdisplacement.Add((int)(displacement*1000)); // mm --> um
+							
 						}
 						catch (FormatException ex)
 						{
@@ -743,6 +737,7 @@ namespace modbustrial
 					
 					
 				}
+				AppendBLGF("Done");
 
 			}
 		}
@@ -751,5 +746,162 @@ namespace modbustrial
 		{
 
 		}
+
+		private async void BLGF_StartTest_Click(object sender, EventArgs e)
+		{
+			try
+			{
+				cts?.Cancel();
+				cts?.Dispose();
+				cts = new CancellationTokenSource();
+
+
+				await Task.Run(async () => await BLGF_test(cts.Token), cts.Token);
+				//await Task.Run(async () => await Linear(cts.Token), cts.Token);
+
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"Error: {ex.Message}");
+			}
+
+
+
+		}
+		private async Task Linear(CancellationToken ct)
+		{
+
+
+			while (!ct.IsCancellationRequested) // 使用 CancellationToken 來控制結束
+			{
+				await BLGF_getinfo();
+				await Task.Delay(1, ct);
+				await HatpicConstant(this.position/10);
+				await Task.Delay(1, ct);
+				await transferp_l(8);
+				await Task.Delay(1, ct); // 允許取消
+			}
+
+		}
+		private async Task<int> Findforce( int target)
+		{
+			if (target > this.BLGFdisplacement.Max()) { return 0; }
+
+			int index = this.BLGFdisplacement.BinarySearch(target);
+
+			if (index >= 0) return index; // Exact match found
+
+			int insertionPoint = ~index;
+
+			// Check boundaries
+			if (insertionPoint == 0) return 0;
+			if (insertionPoint == this.BLGFdisplacement.Count) return this.BLGFdisplacement.Count - 1;
+
+			// Compare the closest two neighbors
+			int prev = insertionPoint - 1;
+			int next = insertionPoint;
+
+			return await Interpolation(target,prev,next,this.BLGFdisplacement,this.BLGFForce);
+		}
+		private async Task<int> Interpolation(int curdis,int prev, int next, List<int> dis, List<int>frc)
+		{
+			return frc[prev] + ((frc[next] - frc[prev])*(curdis-dis[prev])/(dis[next] - dis[prev]));
+		}
+		private async Task BLGF_test(CancellationToken ct)
+		{
+			try
+			{
+				while (!ct.IsCancellationRequested) // 使用 CancellationToken 來控制結束
+				{
+					await MotorCommandStream(0X22, 3);
+					await transferp_l(19);
+					await Task.Delay(1, ct);					
+					int frc = await Findforce(this.position);
+					AppendBLGF(frc.ToString());
+					await Task.Delay(1, ct);
+					await HatpicConstant(frc);
+					await transferp_l(8);
+					await Task.Delay(1, ct); // 允許取消
+				}
+			}
+			catch (TaskCanceledException)
+			{
+				Console.WriteLine("Streaming task was canceled.");
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"Unexpected error: {ex.Message}");
+			}
+		}
+		private async Task BLGF_getinfo()
+		{
+			await MotorCommandStream(0X22, 1);
+			byte[] buffer = new byte[19];
+			await port.BaseStream.ReadAsync(buffer, 0, buffer.Length);
+			string hex = BitConverter.ToString(buffer);
+			AppendText(hex);
+
+
+			while (buffer[0] != (byte)0X01 || buffer[1] != (byte)0X64)
+			{
+				await MotorCommandStream(0X22, 1);
+				await port.BaseStream.ReadAsync(buffer, 0, buffer.Length);
+				AppendText(BitConverter.ToString(buffer));
+				await Task.Delay(1);
+
+			}
+
+			byte[] b_position = new byte[] { buffer[5], buffer[4], buffer[3], buffer[2] };
+			this.position = BitConverter.ToInt32(b_position, 0);
+			byte[] b_force = new byte[] { buffer[9], buffer[8], buffer[7], buffer[6] };
+			this.force = BitConverter.ToInt32(b_force, 0);
+
+
+
+			Stream_forcetextbox.Invoke(new Action(() =>
+			Stream_forcetextbox.Text = this.force.ToString()
+			));
+			Stream_positiontextbox.Invoke(new Action(() =>
+			Stream_positiontextbox.Text = this.position.ToString()
+			));
+
+
+		}
+
+		private async Task<int> BLGF_searchforce(int cursor, int curdis)
+		{
+			if (curdis >= BLGFdisplacement[cursor])
+			{
+				while (curdis >= BLGFdisplacement[cursor])
+				{
+					cursor++;
+
+				}
+				this.BLGFcursor = cursor;
+				return BLGFForce[cursor];
+			}
+			else
+			{
+				while (curdis < BLGFdisplacement[cursor])
+				{
+					cursor--;
+
+				}
+				this.BLGFcursor = cursor;
+				return BLGFForce[cursor];
+			}
+			
+		
+		}
+
+		private void BLGF_EndTest_Click(object sender, EventArgs e)
+		{
+			if (!cts.IsCancellationRequested)
+			{
+				cts.Cancel();
+			}
+		}
+
+		
 	}
 }

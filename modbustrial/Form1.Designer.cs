@@ -53,6 +53,9 @@
 			this.label12 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.panel4 = new System.Windows.Forms.Panel();
+			this.BLGF_EndTest = new System.Windows.Forms.Button();
+			this.BLGF_StartTest = new System.Windows.Forms.Button();
+			this.ttry = new System.Windows.Forms.TextBox();
 			this.BLGF_selectpathButton = new System.Windows.Forms.Button();
 			this.label15 = new System.Windows.Forms.Label();
 			this.command_force = new System.Windows.Forms.TextBox();
@@ -64,8 +67,6 @@
 			this.label7 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label14 = new System.Windows.Forms.Label();
-			this.ttry = new System.Windows.Forms.TextBox();
-			this.BLGF_StartTest = new System.Windows.Forms.Button();
 			this.panel1.SuspendLayout();
 			this.panel3.SuspendLayout();
 			this.panel4.SuspendLayout();
@@ -325,6 +326,7 @@
 			// 
 			// panel4
 			// 
+			this.panel4.Controls.Add(this.BLGF_EndTest);
 			this.panel4.Controls.Add(this.BLGF_StartTest);
 			this.panel4.Controls.Add(this.ttry);
 			this.panel4.Controls.Add(this.BLGF_selectpathButton);
@@ -343,10 +345,46 @@
 			this.panel4.Size = new System.Drawing.Size(940, 857);
 			this.panel4.TabIndex = 5;
 			// 
+			// BLGF_EndTest
+			// 
+			this.BLGF_EndTest.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+			this.BLGF_EndTest.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.BLGF_EndTest.Location = new System.Drawing.Point(270, 487);
+			this.BLGF_EndTest.Name = "BLGF_EndTest";
+			this.BLGF_EndTest.Size = new System.Drawing.Size(235, 56);
+			this.BLGF_EndTest.TabIndex = 15;
+			this.BLGF_EndTest.Text = "End Test";
+			this.BLGF_EndTest.UseVisualStyleBackColor = true;
+			this.BLGF_EndTest.Click += new System.EventHandler(this.BLGF_EndTest_Click);
+			// 
+			// BLGF_StartTest
+			// 
+			this.BLGF_StartTest.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+			this.BLGF_StartTest.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.BLGF_StartTest.Location = new System.Drawing.Point(25, 487);
+			this.BLGF_StartTest.Name = "BLGF_StartTest";
+			this.BLGF_StartTest.Size = new System.Drawing.Size(235, 56);
+			this.BLGF_StartTest.TabIndex = 14;
+			this.BLGF_StartTest.Text = "Start Test";
+			this.BLGF_StartTest.UseVisualStyleBackColor = true;
+			this.BLGF_StartTest.Click += new System.EventHandler(this.BLGF_StartTest_Click);
+			// 
+			// ttry
+			// 
+			this.ttry.Font = new System.Drawing.Font("新細明體", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+			this.ttry.Location = new System.Drawing.Point(25, 565);
+			this.ttry.Multiline = true;
+			this.ttry.Name = "ttry";
+			this.ttry.ReadOnly = true;
+			this.ttry.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+			this.ttry.Size = new System.Drawing.Size(529, 240);
+			this.ttry.TabIndex = 13;
+			this.ttry.TextChanged += new System.EventHandler(this.ttry_TextChanged);
+			// 
 			// BLGF_selectpathButton
 			// 
 			this.BLGF_selectpathButton.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-			this.BLGF_selectpathButton.Location = new System.Drawing.Point(23, 319);
+			this.BLGF_selectpathButton.Location = new System.Drawing.Point(25, 415);
 			this.BLGF_selectpathButton.Name = "BLGF_selectpathButton";
 			this.BLGF_selectpathButton.Size = new System.Drawing.Size(235, 56);
 			this.BLGF_selectpathButton.TabIndex = 12;
@@ -358,7 +396,7 @@
 			// 
 			this.label15.AutoSize = true;
 			this.label15.Font = new System.Drawing.Font("Book Antiqua", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label15.Location = new System.Drawing.Point(17, 268);
+			this.label15.Location = new System.Drawing.Point(19, 364);
 			this.label15.Name = "label15";
 			this.label15.Size = new System.Drawing.Size(241, 35);
 			this.label15.TabIndex = 11;
@@ -367,7 +405,7 @@
 			// command_force
 			// 
 			this.command_force.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-			this.command_force.Location = new System.Drawing.Point(529, 585);
+			this.command_force.Location = new System.Drawing.Point(511, 274);
 			this.command_force.Name = "command_force";
 			this.command_force.ReadOnly = true;
 			this.command_force.Size = new System.Drawing.Size(139, 31);
@@ -375,7 +413,7 @@
 			// 
 			// force_adjust
 			// 
-			this.force_adjust.Location = new System.Drawing.Point(28, 581);
+			this.force_adjust.Location = new System.Drawing.Point(10, 270);
 			this.force_adjust.Maximum = 50000;
 			this.force_adjust.Name = "force_adjust";
 			this.force_adjust.Size = new System.Drawing.Size(495, 56);
@@ -439,7 +477,7 @@
 			// 
 			this.label9.AutoSize = true;
 			this.label9.Font = new System.Drawing.Font("Book Antiqua", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label9.Location = new System.Drawing.Point(37, 537);
+			this.label9.Location = new System.Drawing.Point(19, 226);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(135, 22);
 			this.label9.TabIndex = 1;
@@ -449,34 +487,11 @@
 			// 
 			this.label14.AutoSize = true;
 			this.label14.Font = new System.Drawing.Font("Book Antiqua", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label14.Location = new System.Drawing.Point(674, 594);
+			this.label14.Location = new System.Drawing.Point(656, 283);
 			this.label14.Name = "label14";
 			this.label14.Size = new System.Drawing.Size(39, 22);
 			this.label14.TabIndex = 1;
 			this.label14.Text = "mN";
-			// 
-			// ttry
-			// 
-			this.ttry.Font = new System.Drawing.Font("新細明體", 13.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-			this.ttry.Location = new System.Drawing.Point(296, 319);
-			this.ttry.Multiline = true;
-			this.ttry.Name = "ttry";
-			this.ttry.ReadOnly = true;
-			this.ttry.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.ttry.Size = new System.Drawing.Size(529, 240);
-			this.ttry.TabIndex = 13;
-			this.ttry.TextChanged += new System.EventHandler(this.ttry_TextChanged);
-			// 
-			// BLGF_StartTest
-			// 
-			this.BLGF_StartTest.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-			this.BLGF_StartTest.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.BLGF_StartTest.Location = new System.Drawing.Point(23, 391);
-			this.BLGF_StartTest.Name = "BLGF_StartTest";
-			this.BLGF_StartTest.Size = new System.Drawing.Size(235, 56);
-			this.BLGF_StartTest.TabIndex = 14;
-			this.BLGF_StartTest.Text = "Start Test";
-			this.BLGF_StartTest.UseVisualStyleBackColor = true;
 			// 
 			// Form1
 			// 
@@ -539,6 +554,7 @@
 		private System.Windows.Forms.Label label15;
 		private System.Windows.Forms.TextBox ttry;
 		private System.Windows.Forms.Button BLGF_StartTest;
+		private System.Windows.Forms.Button BLGF_EndTest;
 	}
 }
 
