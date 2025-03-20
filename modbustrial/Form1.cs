@@ -13,6 +13,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.IO;
 using System.Runtime.InteropServices;
 
+
 namespace modbustrial
 {
 	public partial class Form1 : Form
@@ -44,7 +45,11 @@ namespace modbustrial
 		List<int> BLGFdisplacement;
 		int BLGFcursor;
 
-
+		//Timers for recording datas
+		System.Threading.Timer timer;
+		List<int> IrisPosition;
+		List<int> IrisForce;
+		string recordpath = "C:\\Users\\jim.kuo\\OneDrive - shl-group.com\\Desktop\\training\\plunger force\\Motor\\modbustrial\\record.csv";
 
 
 		public enum Mode
@@ -902,6 +907,45 @@ namespace modbustrial
 			}
 		}
 
-		
+		private void BLGF_Startrecord_Click(object sender, EventArgs e)
+		{
+			IrisForce = new List<int>();
+			IrisPosition = new List<int>();
+
+			TimerCallback callback = new TimerCallback(record);
+			this.timer = new System.Threading.Timer(callback, null, 0, 100);
+
+
+		}
+		private void record(object state)
+		{
+			if (this.IrisPosition == null || this.IrisForce == null)
+			{
+				MessageBox.Show("not recording");
+				return;
+			}
+
+			this.IrisPosition.Add(this.position);
+			this.IrisForce.Add(this.force);
+		}
+
+		private void BLGF_EndRecord_Click(object sender, EventArgs e)
+		{
+			if(this.timer != null)
+			{
+				timer.Dispose();
+				int count = Math.Min(this.IrisForce.Count, this.IrisPosition.Count);
+
+				using (StreamWriter writer = new StreamWriter(this.recordpath))
+				{
+					writer.WriteLine("Displacement (um),Force(mN)");
+					for(int i = 0; i < count; i++)
+					{
+						writer.WriteLine($"{this.IrisPosition[i]},{this.IrisForce[i]}");
+
+					}
+				}
+			}
+		}
 	}
 }

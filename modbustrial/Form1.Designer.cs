@@ -53,6 +53,8 @@
 			this.label12 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.panel4 = new System.Windows.Forms.Panel();
+			this.BLGF_EndRecord = new System.Windows.Forms.Button();
+			this.BLGF_Startrecord = new System.Windows.Forms.Button();
 			this.BLGF_EndTest = new System.Windows.Forms.Button();
 			this.BLGF_StartTest = new System.Windows.Forms.Button();
 			this.ttry = new System.Windows.Forms.TextBox();
@@ -326,6 +328,8 @@
 			// 
 			// panel4
 			// 
+			this.panel4.Controls.Add(this.BLGF_EndRecord);
+			this.panel4.Controls.Add(this.BLGF_Startrecord);
 			this.panel4.Controls.Add(this.BLGF_EndTest);
 			this.panel4.Controls.Add(this.BLGF_StartTest);
 			this.panel4.Controls.Add(this.ttry);
@@ -345,6 +349,28 @@
 			this.panel4.Size = new System.Drawing.Size(940, 857);
 			this.panel4.TabIndex = 5;
 			// 
+			// BLGF_EndRecord
+			// 
+			this.BLGF_EndRecord.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+			this.BLGF_EndRecord.Location = new System.Drawing.Point(540, 487);
+			this.BLGF_EndRecord.Name = "BLGF_EndRecord";
+			this.BLGF_EndRecord.Size = new System.Drawing.Size(219, 56);
+			this.BLGF_EndRecord.TabIndex = 16;
+			this.BLGF_EndRecord.Text = "End Record";
+			this.BLGF_EndRecord.UseVisualStyleBackColor = true;
+			this.BLGF_EndRecord.Click += new System.EventHandler(this.BLGF_EndRecord_Click);
+			// 
+			// BLGF_Startrecord
+			// 
+			this.BLGF_Startrecord.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+			this.BLGF_Startrecord.Location = new System.Drawing.Point(540, 415);
+			this.BLGF_Startrecord.Name = "BLGF_Startrecord";
+			this.BLGF_Startrecord.Size = new System.Drawing.Size(219, 56);
+			this.BLGF_Startrecord.TabIndex = 16;
+			this.BLGF_Startrecord.Text = "Start Record";
+			this.BLGF_Startrecord.UseVisualStyleBackColor = true;
+			this.BLGF_Startrecord.Click += new System.EventHandler(this.BLGF_Startrecord_Click);
+			// 
 			// BLGF_EndTest
 			// 
 			this.BLGF_EndTest.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
@@ -361,7 +387,7 @@
 			// 
 			this.BLGF_StartTest.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
 			this.BLGF_StartTest.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.BLGF_StartTest.Location = new System.Drawing.Point(25, 487);
+			this.BLGF_StartTest.Location = new System.Drawing.Point(270, 415);
 			this.BLGF_StartTest.Name = "BLGF_StartTest";
 			this.BLGF_StartTest.Size = new System.Drawing.Size(235, 56);
 			this.BLGF_StartTest.TabIndex = 14;
@@ -555,6 +581,8 @@
 		private System.Windows.Forms.TextBox ttry;
 		private System.Windows.Forms.Button BLGF_StartTest;
 		private System.Windows.Forms.Button BLGF_EndTest;
+		private System.Windows.Forms.Button BLGF_EndRecord;
+		private System.Windows.Forms.Button BLGF_Startrecord;
 	}
 }
 
